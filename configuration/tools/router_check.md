@@ -1,24 +1,24 @@
 # 路由表检查工具
 
-**NOTE: The following configuration is for the route table check tool only and is not part of the Envoy binary. The route table check tool is a standalone binary that can be used to verify Envoy’s routing for a given configuration file.**
+**注意:下面的配置仅用于路由表检查工具，而不是Envoy二进制文件的一部分。路由表检查工具是一个独立的二进制文件，它可以用来验证Envy对给定配置文件的路由。**
 
-The following specifies input to the route table check tool. The route table check tool checks if the route returned by a [router](../../api-v1/route_config/route_config.md#config-http-conn-man-route-table) matches what is expected. The tool can be used to check cluster name, virtual cluster name, virtual host name, manual path rewrite, manual host rewrite, path redirect, and header field matches. Extensions for other test cases can be added. Details about installing the tool and sample tool input/output can be found at [installation](../../install/tools/route_table_check_tool.md#install-tools-route-table-check-tool).
+下面指定了路由表检查工具的输入。路由表检查工具检查[路由器](../../api-v1/route_config/route_config.md#config-http-conn-man-route-table)返回的路由信息是否符合预期。该工具可用于检查集群名称、虚拟集群名称、虚拟主机名、手动路径重写、手动主机重写、路径重定向和头字段匹配。 可以添加其它测试用例的扩展。安装工具和示例工具输入/输出的详细信息可以在[这里](../../install/tools/route_table_check_tool.md#install-tools-route-table-check-tool)找到。
 
-The route table check tool config is composed of an array of json test objects. Each test object is composed of three parts.
+路由表检查工具配置由一系列json测试对象组成。每个测试对象由三个部分组成。
 
 - Test name
 
-  This field specifies the name of each test object.
+该字段指定每个测试对象的名称。
 
 - Input values
 
-  The input value fields specify the parameters to be passed to the router. Example input fields include the :authority, :path, and :method header fields. The :authority and :path fields specify the url sent to the router and are required. All other input fields are optional.
+  输入值字段指定要传递给路由器的参数。例如输入字段包括：权限，：路径：方法头字段。权限：path字段指定发送到路由器的url并是必须要添加的。所有其他输入字段都是可选的。
 
 - Validate
 
-  The validate fields specify the expected values and test cases to check. At least one test case is required.
-
-A simple tool configuration json has one test case and is written as follows. The test expects a cluster name match of “instant-server”.:
+  validate字段指定要检查的期望值和测试用例。至少需要一个测试用例。
+  
+ 看下面的一个简单的json工具配置参数，其包含有一个测试用例。测试期望与“instant-server”的集群名称匹配。：
 
 ```json
 [
@@ -85,12 +85,12 @@ A simple tool configuration json has one test case and is written as follows. Th
 
 - test_name
 
-  *(required, string)* The name of a test object.
+  *(required, string)* 测试对象的名称.
 
-- input
+- input路径法
 
-  *(required, object)* Input values sent to the router that determine the returned route.:authority*(required, string)* The url authority. This value along with the path parameter define the url to be matched. An example authority value is “api.lyft.com”.:path*(required, string)* The url path. An example path value is “/foo”.:method*(optional, string)* The request method. If not specified, the default method is GET. The options are GET, PUT, or POST.internal*(optional, boolean)* A flag that determines whether to set x-envoy-internal to “true”. If not specified, or if internal is equal to false, x-envoy-internal is not set.random_value*(optional, integer)* An integer used to identify the target for weighted cluster selection. The default value of random_value is 0.ssl*(optional, boolean)* A flag that determines whether to set x-forwarded-proto to https or http. By setting x-forwarded-proto to a given protocol, the tool is able to simulate the behavior of a client issuing a request via http or https. By default ssl is false which corresponds to x-forwarded-proto set to http.additional_headers*(optional, array)* Additional headers to be added as input for route determination. The “:authority”, “:path”, “:method”, “x-forwarded-proto”, and “x-envoy-internal” fields are specified by the other config options and should not be set here.field*(required, string)* The name of the header field to add.value*(required, string)* The value of the header field to add.
+  *(required, object)* 输入值发送到路由器，以确定返回的路由信息：authority*(required, string)* url权限。这个值与path参数一起定义要匹配的。例如权限的值是“api.lyft.com”.:path*(required, string)* url的路径。例如路径的值是 “/foo”.:method*(optional, string)* 请求的方法。如果没有指定，默认采用get方法。这里可以选择GET方法, PUT方法或者POST方法。internal*(optional, boolean)* 它是是否将x-envoy-internal设置为“true”的一个标志。如果没有指定或者指定为false，x-envoy-internal就没有配置。random_value*(optional, integer)* 用于确定加权集群选择目标的整数。默认值是0。ssl*(optional, boolean)* 决定将 x-forwarded-proto设置为http或者https。通过给定的协议设置x-forwarded-proto，该工具能够模拟客户机通过http或https发出请求的行为。 默认情况下ssl是false，相当于将x-forwarded-proto设置为http。additional_headers*(optional, array)* Additional headers将作为路径确定的输入添加。“:authority”, “:path”, “:method”, “x-forwarded-proto”, and “x-envoy-internal” 字段应该有其他配置选项指定，而不应该在这里配置。field*(required, string)* 要添加的头字段的名称。value*(required, string)* 要添加的投字段的值。
 
 - validate
 
-  *(required, object)* The validate object specifies the returned route parameters to match. At least one test parameter must be specificed. Use “” (empty string) to indicate that no return value is expected. For example, to test that no cluster match is expected use {“cluster_name”: “”}.cluster_name*(optional, string)* Match the cluster name.virtual_cluster_name*(optional, string)* Match the virtual cluster name.virtual_host_name*(optional, string)* Match the virtual host name.host_rewrite*(optional, string)* Match the host header field after rewrite.path_rewrite*(optional, string)* Match the path header field after rewrite.path_redirect*(optional, string)* Match the returned redirect path.header_fields*(optional, array)* Match the listed header fields. Examples header fields include the “:path”, “cookie”, and “date” fields. The header fields are checked after all other test cases. Thus, the header fields checked will be those of the redirected or rewriten routes when applicable.field*(required, string)* The name of the header field to match.value*(required, string)* The value of the header field to match.
+  *(required, object)* validate对象指定要匹配的返回路线参数。至少需要指定一个参数， 使用“” (空字符串)来表示没有返回值。 例如, 测试没有集群能够使用{“cluster_name”: “”}进行匹配。cluster_name*(optional, string)* 匹配集群的名称。virtual_cluster_name*(optional, string)* 匹配虚拟集群的名称。virtual_host_name*(optional, string)* 匹配虚拟机的名称.host_rewrite*(optional, string)* 匹配重写后的主机字段头。path_rewrite*(optional, string)* 匹配重写后的路径字段头。path_redirect*(optional, string)* 匹配返回的重定向路径。header_fields*(optional, array)* 匹配列出的头字段。例如头字段包括“:path”, “cookie”, 以及 “date” 字段。在其它测试用例之后检查头字段。因此, 所检查的头字段将是重定向或重写路由信息。field*(required, string)* 要匹配的头字段的名称。value*(required, string)* 要匹配的头字段的值。
