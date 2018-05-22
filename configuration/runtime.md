@@ -6,8 +6,8 @@
 
 要小心使用[/runtime_modify](../operations/admin.md#operations-admin-interface-runtime-modify) 端点。 其变更是立即生效的。管理接口的[妥善的保护](../operations/admin.md#operations-admin-interface-security)是非常**重要**的。
 
-- [v1 API 参考](../api-v1/runtime.md#config-runtime-v1)
-- [v2 API 参考](../api-v2/config/bootstrap/v2/bootstrap.proto.md#envoy-api-msg-config-bootstrap-v2-runtime)
+- [v1 API 参考](https://www.envoyproxy.io/docs/envoy/latest/api-v1/runtime#config-runtime-v1)
+- [v2 API 参考](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto#envoy-api-msg-config-bootstrap-v2-runtime)
 
 ## 文件系统设计
 
