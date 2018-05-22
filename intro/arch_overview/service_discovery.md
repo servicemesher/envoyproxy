@@ -1,60 +1,62 @@
-# Service discovery
+# 服务发现
 
-When an upstream cluster is defined in the [configuration](../../api-v1/cluster_manager/cluster.md#config-cluster-manager-cluster), Envoy needs to know how to resolve the members of the cluster. This is known as *service discovery*.
+当上游集群在[配置](../../api-v1/cluster_manager/cluster.md#config-cluster-manager-cluster)中定义时，Envoy 需要知道如何解析集群的成员。这被称为*服务发现*。
 
-## Supported service discovery types
 
-### Static
+## 支持的服务发现类型
 
-Static is the simplest service discovery type. The configuration explicitly specifies the resolved network name (IP address/port, unix domain socket, etc.) of each upstream host.
+### 静态类型
 
-### Strict DNS
+静态类型是最简单的服务发现类型。配置中会明确指定每个上游主机的已解析网络名称（ IP 地址、端口、unix 域套接字等）。
 
-When using strict DNS service discovery, Envoy will continuously and asynchronously resolve the specified DNS targets. Each returned IP address in the DNS result will be considered an explicit host in the upstream cluster. This means that if the query returns three IP addresses, Envoy will assume the cluster has three hosts, and all three should be load balanced to. If a host is removed from the result Envoy assumes it no longer exists and will drain traffic from any existing connection pools. Note that Envoy never synchronously resolves DNS in the forwarding path. At the expense of eventual consistency, there is never a worry of blocking on a long running DNS query.
+### 严格的 DNS 类型
 
-### Logical DNS
+当使用严格的 DNS 服务发现时，Envoy 将持续并异步地解析指定的 DNS 目标。DNS 结果中的每个返回的 IP 地址将被视为上游集群中的显式主机。这意味着如果查询返回三个 IP 地址，Envoy 将假定该集群有三台主机，并且所有三台主机应该负载均衡。如果有主机从结果中删除，则 Envoy 会认为它不再存在，并且会将它从任何现有连接池中排除。请注意，Envoy 从不同步解析转发路径中的 DNS 。基于最终一致性的策略，永远不用担心长时间运行的 DNS 查询会受到阻塞。
 
-Logical DNS uses a similar asynchronous resolution mechanism to strict DNS. However, instead of strictly taking the results of the DNS query and assuming that they comprise the entire upstream cluster, a logical DNS cluster only uses the first IP address returned *when a new connection needs to be initiated*. Thus, a single logical connection pool may contain physical connections to a variety of different upstream hosts. Connections are never drained. This service discovery type is optimal for large scale web services that must be accessed via DNS. Such services typically use round robin DNS to return many different IP addresses. Typically a different result is returned for each query. If strict DNS were used in this scenario, Envoy would assume that the cluster’s members were changing during every resolution interval which would lead to draining connection pools, connection cycling, etc. Instead, with logical DNS, connections stay alive until they get cycled. When interacting with large scale web services, this is the best of all possible worlds: asynchronous/eventually consistent DNS resolution, long lived connections, and zero blocking in the forwarding path.
 
-### Original destination
+### 逻辑DNS类型
 
-Original destination cluster can be used when incoming connections are redirected to Envoy either via an iptables REDIRECT or TPROXY target or with Proxy Protocol. In these cases requests routed to an original destination cluster are forwarded to upstream hosts as addressed by the redirection metadata, without any explicit host configuration or upstream host discovery. Connections to upstream hosts are pooled and unused hosts are flushed out when they have been idle longer than[*cleanup_interval_ms*](../../api-v1/cluster_manager/cluster.md#config-cluster-manager-cluster-cleanup-interval-ms), which defaults to 5000ms. If the original destination address is is not available, no upstream connection is opened. Original destination service discovery must be used with the original destination [load balancer](load_balancing.md#arch-overview-load-balancing-types-original-destination).
+逻辑 DNS 使用类似异步解析机制来遵循严格的 DNS 策略。但是，这种策略并非严格基于 DNS 的查询结果，逻辑 DNS 集群假设它们构成了整个上游集群并*在需要初始化新连接时*仅使用返回的第一个 IP 地址。因此，单个逻辑连接池可能包含各种不同上游主机的物理连接。并且连接永远不会流失。这种服务发现类型适用于必须通过 DNS 访问的大型 Web 服务。此类服务通常使用循环 DNS 来返回许多不同的 IP 地址。通常为每个查询返回不同的结果。如果在这种情况下使用了严格的 DNS 服务发现类型，Envoy 会假定集群的成员在每个解决时间间隔期间都会发生变化，这将导致连接池枯竭，连接循环等。相反，使用逻辑 DNS，连接会一直保持活动状态直到它们循环。在与大型 Web 服务交互时，这几乎是所有可行策略中最好的方式：异步、最终一致的 DNS 解析、长连接、转发路径零阻塞
 
-### Service discovery service (SDS)
+### 原始目的地类型
 
-The *service discovery service* is a generic [REST based API](../../api-v1/cluster_manager/sds.md#config-cluster-manager-sds-api) used by Envoy to fetch cluster members. Lyft provides a reference implementation via the Python [discovery service](https://github.com/lyft/discovery). That implementation uses AWS DynamoDB as the backing store, however the API is simple enough that it could easily be implemented on top of a variety of different backing stores. For each SDS cluster, Envoy will periodically fetch the cluster members from the discovery service. SDS is the preferred service discovery mechanism for a few reasons:
+当传入连接通过 iptables 重定向 或 TPROXY（查看真实 IP ）目标或使用代理协议重定向到 Envoy 时，可以使用原始目标集群。在这些情况下，使用元数据重定向的策略会使路由到原始目标集群的请求转发到上游主机，并且不需要任何明确的主机配置或上游主机发现机制。与上游主机的连接会被放入链接，并且闲置的主机在空闲时间比 [cleanup_interval_ms](../../api-v1/cluster_manager/cluster.md#config-cluster-manager-cluster-cleanup-interval-ms) 长（默认值为5000 ms）时会被刷新。如果原始目标地址不可用，则不会打开上游连接。这种原始目的地服务发现的方式必须与原始目的地[负载均衡](load_balancing.md#arch-overview-load-balancing-types-original-destination)一起使用。
 
-- Envoy has explicit knowledge of each upstream host (vs. routing through a DNS resolved load balancer) and can make more intelligent load balancing decisions.
-- Extra attributes carried in the discovery API response for each host inform Envoy of the host’s load balancing weight, canary status, zone, etc. These additional attributes are used globally by the Envoy mesh during load balancing, statistic gathering, etc.
 
-Generally active health checking is used in conjunction with the eventually consistent service discovery service data to making load balancing and routing decisions. This is discussed further in the following section.
+### 服务发现服务（SDS）
+Envoy 通过一个*发现服务的服务*获取集群成员, 它是 [REST 风格的 API](../../api-v1/cluster_manager/sds.md#config-cluster-manager-sds-api)。Lyft 提供了基于 Python 语言的 [发现服务](https://github.com/lyft/discovery)参考实现。该实现使用 AWS DynamoDB 作为存储类型，但该 API 非常简单，可以轻松地在各种不同的存储类型之上实施。对于每个 SDS 集群，Envoy 将定期从发现服务中获取集群成员。由于以下几个原因，SDS 是首选的服务发现机制：
 
-## On eventually consistent service discovery
+- Envoy 对每个上游主机都有明确的了解（与通过 DNS 解析的负载均衡进行路由相比而言），并可以做出更智能的负载平衡决策。
+- 在每个主机的发现 API 响应中携带的额外属性通知 Envoy 负载平衡权重、金丝雀状态、区域等。这些附加属性在负载平衡、统计信息收集等过程中会被 Envoy 网格全局使用。
 
-Many existing RPC systems treat service discovery as a fully consistent process. To this end, they use fully consistent leader election backing stores such as Zookeeper, etcd, Consul, etc. Our experience has been that operating these backing stores at scale is painful.
+通常，主动健康检查与最终一致的服务发现服务数据结合使用，以进行负载平衡和路由决策。这将在下一节中进一步讨论。
 
-Envoy was designed from the beginning with the idea that service discovery does not require full consistency. Instead, Envoy assumes that hosts come and go from the mesh in an eventually consistent way. Our recommended way of deploying a service to service Envoy mesh configuration uses eventually consistent service discovery along with [active health checking](health_checking.md#arch-overview-health-checking) (Envoy explicitly health checking upstream cluster members) to determine cluster health. This paradigm has a number of benefits:
+## 关于服务发现的最终一致性
 
-- All health decisions are fully distributed. Thus, network partitions are gracefully handled (whether the application gracefully handles the partition is a different story).
-- When health checking is configured for an upstream cluster, Envoy uses a 2x2 matrix to determine whether to route to a host:
+许多现有的 RPC 系统将服务发现视为完全一致的过程。为此，他们使用完全一致的领导选举算法，如 Zookeeper，etcd，Consul 等。我们的经验是，大规模使用这些策略是很痛苦的。
 
-| Discovery Status | HC OK | HC Failed            |
-| ---------------- | ----- | -------------------- |
-| Discovered       | Route | Don’t Route          |
-| Absent           | Route | Don’t Route / Delete |
+Envoy 从一开始就设计服务发现不需要完全一致性。相反的，Envoy 假定主机以最终一致的方式来回穿过网格。我们推荐的将服务部署到服务 Envoy 网格配置的方式使用最终一致的服务发现以及主动运行[健康检查](health_checking.md#arch-overview-health-checking)（Envoy 显式地对上游集群成员进行健康检查）来确定集群运行状况。使用这种方式有许多好处：
 
-- Host discovered / health check OK
+- 所有健康决定都是完全分布的。因此，网络分区可以得到适当的处理（应用程序是否正常处理分区是另一回事）。
+- 为上游集群配置运行状况检查时，Envoy 使用2x2矩阵来确定是否路由到主机：
 
-  Envoy **will route** to the target host.
+| 发现状态           | 健康检查成功| 健康检查失败         |
+| ------------------|-----------|---------------------|
+| 发现              | 路由       | 不要路由             |
+| 缺席              | 路由       | 不用路由、删除        |
 
-- Host absent / health check OK:
+- 主机发现并且健康检查成功
 
-  Envoy **will route** to the target host. This is very important since the design assumes that the discovery service can fail at any time. If a host continues to pass health check even after becoming absent from the discovery data, Envoy will still route. Although it would be impossible to add new hosts in this scenario, existing hosts will continue to operate normally. When the discovery service is operating normally again the data will eventually re-converge.
+  Envoy **将路由**到目标主机
 
-- Host discovered / health check FAIL
+- 主机缺席并且健康检查成功：
 
-  Envoy **will not route** to the target host. Health check data is assumed to be more accurate than discovery data.
+  Envoy **将路由**到目标主机。这是非常重要的，因为设计假定发现服务随时可能失败。如果主机即使在发现数据缺失后仍继续通过健康检查，Envoy 仍会路由。虽然在这种情况下添加新主机是不可能的，但现有主机仍将继续正常运行。当发现服务再次正常运行时，数据将最终重新收集。
 
-- Host absent / health check FAIL
+- 主机发现并且健康检查失败
 
-  Envoy **will not route and will delete** the target host. This is the only state in which Envoy will purge host data.
+  Envoy **不会路由**到目标主机。我们假设健康检查数据比发现数据更准确。
+
+- 主机缺席并且健康检查失败
+
+  Envoy **不会路由并将删除目标主机**。这是 Envoy 清除主机数据的唯一一种情况。
