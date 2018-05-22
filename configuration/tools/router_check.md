@@ -12,7 +12,7 @@
 
 - Input values
 
-  输入值字段指定要传递给路由器的参数。例如输入字段包括`:authority`，`:path`,`:method header fields`。权限：path字段指定发送到路由器的url并是必须要添加的。所有其他输入字段都是可选的。
+  输入值字段指定要传递给路由器的参数。例如输入字段包括`:authority`，`:path`,`:method header fields`。权限：`path`字段指定发送到路由器的`url`并是必须要添加的。所有其他输入字段都是可选的。
 
 - Validate
 
