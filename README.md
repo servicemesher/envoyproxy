@@ -6,7 +6,7 @@ Envoy 官方文档中文版，基于 Envoy 最新的 1.7 版本。
 
 英文官方文档地址：https://www.envoyproxy.io/docs/envoy/latest
 
-在线阅读地址：<https://servicemesher.github.io/envoy/>
+在线阅读地址：<http://www.servicemesher.com/envoy/>
 
 *本文档使用 Gitbook 生成。*
 

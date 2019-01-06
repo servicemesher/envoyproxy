@@ -12,7 +12,7 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 
   一个通过命令行覆盖节点 id 的例子：
 
-   `./envoy -c bootstrap.yaml –config-yaml “node: {id: ‘node1’}”`
+   `./envoy -c bootstrap.yaml –config-yaml "node: {id: 'node1'}"`
 
 - `--v2-config-only`
 
@@ -31,11 +31,11 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 
 - `--local-address-ip-version <string>`
 
-  *(可选)* 填充服务器本地 IP 地址使用的 IP 地址版本。此参数影响各种头部信息，包括附加到 X-Forwarded-For（XFF）头部的内容。选项是 `v4` 或 `v6`. 默认是 `v4`.
+  *(可选)* 填充服务器本地 IP 地址使用的 IP 地址版本。此参数影响各种头部信息，包括附加到 X-Forwarded-For（XFF）头部的内容。选项是 `v4` 或 `v6`。默认是 `v4`。
 
 - `--base-id <integer>`
 
-  *(可选)* 分配共享内存区域时使用的基本 ID. Envoy 在[热重启](../intro/arch_overview/hot_restart.md#arch-overview-hot-restart)时使用共享内存区域。大部分用户永远都不需要设置这个选项。不过，若需要在同一台机器上多次运行 Envoy, 每个运行的 Envoy 需要一个唯一的基本 ID，以免共享内存区域产生冲突。
+  *(可选)* 分配共享内存区域时使用的基本 ID。Envoy 在[热重启](../intro/arch_overview/hot_restart.md#arch-overview-hot-restart)时使用共享内存区域。大部分用户永远都不需要设置这个选项。不过，若需要在同一台机器上多次运行 Envoy，每个运行的 Envoy 需要一个唯一的基本 ID，以免共享内存区域产生冲突。
 
 - `--concurrency <integer>`
 
@@ -51,7 +51,7 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 
 - `--log-format <format string>`
 
-  *(可选)* 用于格式化日志消息元数据的格式字符串。若未设置，会使用一个默认的格式字符串 "[%Y-%m-%d %T.%e][%t][%l][%n] %v".
+  *(可选)* 用于格式化日志消息元数据的格式字符串。若未设置，会使用一个默认的格式字符串 “[%Y-%m-%d %T.%e][%t][%l][%n] %v"。
 
 支持的格式化标记有（包括示例输出）：
 
@@ -89,7 +89,7 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 
 - `--restart-epoch <integer>`
 
-  *(可选)* [热重启](../intro/arch_overview/hot_restart.md#arch-overview-hot-restart)周期（Envoy 被热重启而不是全新启动的次数）。对于第一次启动默认为 0. 此选项告诉 Envoy 是尝试创建，还是打开一个已存在的热重启所需的共享内存区域。每次热重启后它都应该被增加。多数情况下[热重启包装器](hot_restarter.md#operations-hot-restarter)设置的 *RESTART_EPOCH* 环境变量应该被传递给这个选项。
+  *(可选)* [热重启](../intro/arch_overview/hot_restart.md#arch-overview-hot-restart)周期（Envoy 被热重启而不是全新启动的次数）。对于第一次启动默认为 0。此选项告诉 Envoy 是尝试创建，还是打开一个已存在的热重启所需的共享内存区域。每次热重启后它都应该被增加。多数情况下[热重启包装器](hot_restarter.md#operations-hot-restarter)设置的 *RESTART_EPOCH* 环境变量应该被传递给这个选项。
 
 - `--hot-restart-version`
 
@@ -97,11 +97,11 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 
 - `--service-cluster <string>`
 
-  *(可选)* 定义 Envoy 运行的本地服务集群名称。本地服务集群名称首先来自[引导节点](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto#envoy-api-field-config-bootstrap-v2-bootstrap-node)消息的[cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/base.proto#envoy-api-field-core-node-cluster)字段。此命令行选项为指定此值提供了另一种方法，并将覆盖引导配置中设置的任何值。若使用了以下任何功能，则应该通过此命令行选项或引导配置来设置它：[statsd](../intro/arch_overview/statistics.md#arch-overview-statistics), [健康检查集群验证](https://www.envoyproxy.io/docs/envoy/latest/api-v1/cluster_manager/cluster_hc#config-cluster-manager-cluster-hc-service-name), [运行时覆盖目录](https://www.envoyproxy.io/docs/envoy/latest/api-v1/runtime#config-runtime-override-subdirectory), [User Agent 添加](https://www.envoyproxy.io/docs/envoy/latest/api-v1/network_filters/http_conn_man#config-http-conn-man-add-user-agent), [HTTP 全局速率限制](../configuration/http_filters/rate_limit_filter.md#config-http-filters-rate-limit), [CDS](../configuration/cluster_manager/cds.md#config-cluster-manager-cds), 和 [HTTP 跟踪](../intro/arch_overview/tracing.md#arch-overview-tracing).
+  *(可选)* 定义 Envoy 运行的本地服务集群名称。本地服务集群名称首先来自[引导节点](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto#envoy-api-field-config-bootstrap-v2-bootstrap-node)消息的[cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/core/base.proto#envoy-api-field-core-node-cluster)字段。此命令行选项为指定此值提供了另一种方法，并将覆盖引导配置中设置的任何值。若使用了以下任何功能，则应该通过此命令行选项或引导配置来设置它：[statsd](../intro/arch_overview/statistics.md#arch-overview-statistics)、[健康检查集群验证](https://www.envoyproxy.io/docs/envoy/latest/api-v1/cluster_manager/cluster_hc#config-cluster-manager-cluster-hc-service-name)、[运行时覆盖目录](https://www.envoyproxy.io/docs/envoy/latest/api-v1/runtime#config-runtime-override-subdirectory)、[User Agent 添加](https://www.envoyproxy.io/docs/envoy/latest/api-v1/network_filters/http_conn_man#config-http-conn-man-add-user-agent)、 [HTTP 全局速率限制](../configuration/http_filters/rate_limit_filter.md#config-http-filters-rate-limit)、[CDS](../configuration/cluster_manager/cds.md#config-cluster-manager-cds) 和 [HTTP 跟踪](../intro/arch_overview/tracing.md#arch-overview-tracing)。
 
 - `--service-node <string>`
 
-  *(可选)* 定义 Envoy 运行的本地服务节点名称。本地服务节点名称首先来自[引导节点](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto#envoy-api-field-config-bootstrap-v2-bootstrap-node)消息的消息的 id 字段。此命令行选项为指定此值提供了另一种方法，并将覆盖引导配置中设置的任何值。若使用了以下任何功能，则应该通过此命令行选项或引导配置来设置它：[statsd](../intro/arch_overview/statistics.md#arch-overview-statistics), [CDS](../configuration/cluster_manager/cds.md#config-cluster-manager-cds) 和 [HTTP 跟踪](../intro/arch_overview/tracing.md#arch-overview-tracing)。
+  *(可选)* 定义 Envoy 运行的本地服务节点名称。本地服务节点名称首先来自[引导节点](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto#envoy-api-field-config-bootstrap-v2-bootstrap-node)消息的消息的 id 字段。此命令行选项为指定此值提供了另一种方法，并将覆盖引导配置中设置的任何值。若使用了以下任何功能，则应该通过此命令行选项或引导配置来设置它：[statsd](../intro/arch_overview/statistics.md#arch-overview-statistics)、[CDS](../configuration/cluster_manager/cds.md#config-cluster-manager-cds) 和 [HTTP 跟踪](../intro/arch_overview/tracing.md#arch-overview-tracing)。
 
 - `--service-zone <string>`
 
@@ -122,11 +122,12 @@ Envoy 由 JSON 配置文件和一组命令行选项一起驱动。以下是 Envo
 - `--max-obj-name-len <uint64_t>`
 
   *(可选)* cluster/route_config/listener 中名称字段的最大长度（以字节为单位）。此选项通常用于自动生成集群名称的场景，通常超过会 60 字符的内部限制。默认为 60。
+
   > *注意：此设置会影响 [`--hot-restart-version`](#cmdoption-hot-restart-version) 的输出。若您开始使用此选项并设置为非默认值，则应该使用相同的值配置到热重启的新进程。*
 
 - `--max-stats <uint64_t>`
 
-  *(可选)* 热重启间可以共享统计的最大数量。此设置会影响 [`--hot-restart-version`](#cmdoption-hot-restart-version) 的输出；热重启必须使用相同的值。默认为 16384.
+  *(可选)* 热重启间可以共享统计的最大数量。此设置会影响 [`--hot-restart-version`](#cmdoption-hot-restart-version) 的输出；热重启必须使用相同的值。默认为 16384。
 
 - `--disable-hot-restart`
 

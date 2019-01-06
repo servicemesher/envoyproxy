@@ -97,8 +97,6 @@ Hello from behind Envoy (service 2)! hostname: 92f4a3737bbc resolvedhostname: 17
 
 **步骤 5：测试 Envoy 的负载均衡能力**
 
-Now let’s scale up our service1 nodes to demonstrate the clustering abilities of envoy.:
-
 现在扩展我们的 service1 节点来演示 envoy 的集群能力：
 
 ```bash
@@ -167,8 +165,6 @@ Hello from behind Envoy (service 1)! hostname: f26027f1ce28 resolvedhostname: 17
 ```
 
 **步骤 6：进入容器并 curl 服务**
-
-In addition of using `curl` from your host machine, you can also enter the containers themselves and `curl` from inside them. To enter a container you can use `docker-compose exec <container_name> /bin/bash`. For example we can enter the `front-envoy` container, and `curl` for services locally:
 
 除了使用主机上的 `curl` 外，您还可以进入容器并从容器里面 `curl`。要进入容器，可以使用 `docker-compose exec <容器名> /bin/bash`。例如，我们可以进入前端 envoy 容器，并在本地 `curl` 服务：
 

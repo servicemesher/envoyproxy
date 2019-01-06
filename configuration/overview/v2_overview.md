@@ -1,18 +1,18 @@
 # v2 API 概览
 
-Envoy v2 API 被定义为 [data plane API repository](https://github.com/envoyproxy/data-plane-api/tree/master/api) 中的 [proto3](https://developers.google.com/protocol-buffers/docs/proto3) [Protocol Buffers](https://developers.google.com/protocol-buffers/)。其改进了现有的 [v1 API 和概念](v1_overview.html#config-overview-v1)以支持：
+Envoy v2 API 被定义为 [data plane API repository](https://github.com/envoyproxy/data-plane-api/) 中的 [proto3](https://developers.google.com/protocol-buffers/docs/proto3) [Protocol Buffers](https://developers.google.com/protocol-buffers/)。其改进了现有的 [v1 API 和概念](v1_overview.html#config-overview-v1)以支持：
 
-- 通过 gRPC 流式传输对[xDS](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md) API的更新，这减少了资源的需求并且可以降低更新延迟。
-- 一种新的 REST-JSON API。其中 JSON/YAML 格式是通过 [proto3 规范的 JSON 映射](https://developers.google.com/protocol-buffers/docs/proto3#json)机械地派生出来的。  
+- 通过 gRPC 流式传输对 [xDS](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md) API 的更新，这减少了资源的需求并且可以降低更新延迟。
+- 一种新的 REST-JSON API。其中 JSON/YAML 格式是通过 [proto3 规范的 JSON 映射](https://developers.google.com/protocol-buffers/docs/proto3#json)机制派生出来的。  
 - 通过文件系统、REST-JSON 或 gRPC 端点传递更新。  
-- 通过扩展端点分配 API 进行高级负载平衡，并向管理服务器报告负载以及资源的利用率。
-- 当需要[更强的一致性和排序属性](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md#eventual-consistency-considerations) 时，Envoy v2 API 仍然可以保持基准最终一致性模型。  
+- 通过扩展端点分配 API 进行高级负载均衡，并向管理服务器报告负载以及资源的利用率。
+- 当需要[更强的一致性和排序属性](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md#eventual-consistency-considerations)时，Envoy v2 API 仍然可以保持基准最终一致性模型。  
 
-Envoy与管理服务器之间的关于v2消息交换方面的更多详细信息，请参阅 [xDS协议说明](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md)。 
+Envoy 与管理服务器之间的关于 v2 消息交换方面的更多详细信息，请参阅 [xDS 协议说明](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md)。 
 
 ## Bootstrap 配置
 
-要使用 v2 API，需要提供引导程序配置文件。其提供了静态服务器配置以及根据需要配置 Envoy 以访问[动态配置](../../intro/arch_overview/dynamic_configuration.html#arch-overview-dynamic-config)。 与v1 JSON/YAML 配置一样，可以在命令行通过[`-c`](../../operations/cli.html#cmdoption-c) 标志提供，即：
+要使用 v2 API，需要提供引导程序配置文件。其提供了静态服务器配置以及根据需要配置 Envoy 以访问[动态配置](../../intro/arch_overview/dynamic_configuration.html#arch-overview-dynamic-config)。 与 v1 JSON/YAML 配置一样，可以在命令行通过[`-c`](../../operations/cli.html#cmdoption-c) 标志提供，即：
 
 ```bash
 ./envoy -c <path to config>.{json,yaml,pb,pb_text} --v2-config-only
@@ -20,7 +20,7 @@ Envoy与管理服务器之间的关于v2消息交换方面的更多详细信息�
 
 扩展映射底层 v2 配置。 [`--v2-config-only`](../../operations/cli.html#cmdoption-v2-config-only) 标志并不是严格要求的，因为 Envoy 会自动的尝试监测配置文件的版本，但是在配置解析失败时，该选项可以提供增强的调试体验。  
 
-[Bootstrap](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 消息是配置的根，[Bootstrap](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 消息中一个关键的概念是静态和动态资源的之间的区别。例如[Listener](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/lds.proto.html#envoy-api-msg-listener) 或 [Cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster) 这些资源可以在[static_resources](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-static-resources) 静态的获得，或者具有如在 [dynamic_resources](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources)中配置的[LDS](../listeners/lds.html#config-listeners-lds)或[CDS](../cluster_manager/cds.html#config-cluster-manager-cds)之类的xDS服务。  
+[Bootstrap](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 消息是配置的根本来源，[Bootstrap](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 消息中一个关键的概念是静态和动态资源的之间的区别。例如 [Listener](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/lds.proto.html#envoy-api-msg-listener) 或 [Cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster) 这些资源既可以从 [static_resources](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-static-resources) 静态的获得也可以从 [dynamic_resources](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources) 中配置的 [LDS](../listeners/lds.html#config-listeners-lds) 或 [CDS](../cluster_manager/cds.html#config-cluster-manager-cds) 之类的 xDS 服务获取。  
 
 ## 示例
 
@@ -65,9 +65,9 @@ static_resources:
     hosts: [{ socket_address: { address: 127.0.0.2, port_value: 1234 }}]
 ```
 
-### 除了动态 EDS 大部分静态
+### 除了 EDS 是动态的其他大部分为静态
 
-下面提供了一个引导配置，该配置从以上示例开始，通过监听 127.0.0.3:5678 的 [EDS](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/eds.proto.html#envoy-api-file-envoy-api-v2-eds-proto) gRPC管理服务器进行[动态端点发现](../../intro/arch_overview/dynamic_configuration.html#arch-overview-dynamic-config-sds)：
+下面提供了一个 bootstrap 配置，该配置从以上示例开始，通过监听 127.0.0.3:5678 的 [EDS](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/eds.proto.html#envoy-api-file-envoy-api-v2-eds-proto) gRPC管理服务器进行[动态端点发现](../../intro/arch_overview/dynamic_configuration.html#arch-overview-dynamic-config-sds)：
 
 ```yaml
 admin:
@@ -114,9 +114,9 @@ static_resources:
     hosts: [{ socket_address: { address: 127.0.0.3, port_value: 5678 }}]
 ```
 
-注意上面 *xds_cluster* 被定义为指向 Envoy 管理服务器。 即使在完全动态的配置中，也需要定义一些静态资源，从而将 Envoy 指向其 xDS 管理服务器。  
+注意上面 *xds_cluster* 被定义为指向 Envoy 管理服务器。即使在完全动态的配置中，也需要定义一些静态资源，从而将 Envoy 指向其 xDS 管理服务器。  
 
-在上面的例子中，EDS 管理服务器可以返回一个[发现响应](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/discovery.proto.html#envoy-api-msg-discoveryresponse)的 pro 编码:  
+在上面的例子中，EDS 管理服务器可以返回一个 proto 编码的 [DiscoveryResponse](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/discovery.proto.html#envoy-api-msg-discoveryresponse)：
 
 ```yaml
 version_info: "0"
@@ -164,7 +164,7 @@ static_resources:
     hosts: [{ socket_address: { address: 127.0.0.3, port_value: 5678 }}]
 ```
 
-管理服务器可以用 `LDS` 响应 `LDS` 请求:  
+管理服务器将如下响应 `LDS` 请求:  
 
 ```yaml
 version_info: "0"
@@ -191,7 +191,7 @@ resources:
         - name: envoy.router
 ```
 
-管理服务器可以用 `RDS` 响应 `RDS` 请求：  
+管理服务将如下响应 `RDS` 请求：  
 
 ```yaml
 version_info: "0"
@@ -206,7 +206,7 @@ resources:
       route: { cluster: some_service }
 ```
 
-管理服务器可以用 `CDS` 响应 `CDS` 请求：
+管理服务器将如下响应 `CDS` 请求：
 
 ```yaml
 version_info: "0"
@@ -223,7 +223,7 @@ resources:
         cluster_names: [xds_cluster]
 ```
 
-管理服务器可以用 `EDS` 请求来响应：  
+管理服务器将如下响应 `EDS` 请求：
 
 ```yaml
 version_info: "0"
@@ -241,7 +241,7 @@ resources:
 
 ## 管理服务器
 
-v2 xDS 管理服务器将按照 `gRPC` 和/或 `REST` 服务的要求实现以下端点。在流式 `gRPC` 和 `REST-JSON` 两种情况下，都会发送 [`DiscoveryRequest`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/discovery.proto.html#envoy-api-msg-discoveryrequest) 并根据[xDS协议](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md)接收 [`DiscoveryResponse`]。  
+v2 xDS 管理服务器将按照 `gRPC` 和/或 `REST` 服务的要求实现以下端点。在流式 `gRPC` 和 `REST-JSON` 两种情况下，都会发送 [`DiscoveryRequest`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/discovery.proto.html#envoy-api-msg-discoveryrequest) 并根据 [xDS 协议](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md)接收 `DiscoveryResponse`。  
 
 ### gRPC streaming 端点
 
@@ -257,12 +257,12 @@ cds_config:
     cluster_names: [some_xds_cluster]
 ```
 
-时Envoy将此用作客户端。  
+时 Envoy 将此用作客户端。  
 
 - `POST /envoy.api.v2.EndpointDiscoveryService/StreamEndpoints`
 
 
-有关服务定义，请参阅 [`eds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto)。 在 [`Cluster`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster) 配置的 [`eds_cluster_config`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-field-cluster-eds-cluster-config) 字段中设置为   
+有关服务定义，请参阅 [`eds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto)。在 [`Cluster`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster) 配置的 [`eds_cluster_config`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-field-cluster-eds-cluster-config) 字段中设置为   
 
 
 ```yaml
@@ -308,8 +308,7 @@ config_source:
 
 - `POST /v2/discovery:clusters`
 
-
-有关服务定义，请参阅 [`cds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/cds.proto)。 当在 [`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 配置的[`dynamic_resources`]中设置
+有关服务定义，请参阅 [`cds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/cds.proto)。 当在 [`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 配置的 `dynamic_resources`中设置
 为  
 
 ```yaml
@@ -325,7 +324,7 @@ cds_config:
 - `POST /v2/discovery:endpoints`
 
 
-有关服务定义，请参阅[`eds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto)。 在[`Cluster`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster)配置的[`eds_cluster_config`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto)字段中设置  
+有关服务定义，请参阅 [`eds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto)。在 [`Cluster`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/cds.proto.html#envoy-api-msg-cluster) 配置的 [`eds_cluster_config`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/eds.proto) 字段中设置为
 
 ```yaml
 eds_config:
@@ -338,7 +337,7 @@ eds_config:
 - `POST /v2/discovery:listeners`
 
 
-有关服务定义，请参阅[`lds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/lds.proto)。 当在[`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 配置的[`dynamic_resources`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources)中设置为时，Envoy将此用作客户端。
+有关服务定义，请参阅 [`lds.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/lds.proto)。 当在 [`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 配置的 [`dynamic_resources`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources) 中设置为
 
 ```yaml
 lds_config:
@@ -366,19 +365,19 @@ config_source:
 
 ## 聚合发现服务
 
-虽然`Envoy`从根本上采用了最终的一致性模型，但 ADS 提供了对 API 更新推送进行排序并确保单个管理服务器与 Envoy 节点进行 API 更新相关性的机会。ADS 允许管理服务器在一个单一的双向 gRPC 流上传递一个或多个 API 及其资源。没有这些，一些如 RDS 和 EDS 的 API 就可能需要管理多个流并连接到不同的管理服务器。  
+虽然 Envoy 从根本上采用了最终的一致性模型，但 ADS 提供了对 API 更新推送进行排序并确保单个管理服务器与 Envoy 节点进行 API 更新相关性的机会。ADS 允许管理服务器在一个单一的双向 gRPC 流上传递一个或多个 API 及其资源。没有这些，一些如 RDS 和 EDS 的 API 就可能需要管理多个流并连接到不同的管理服务器。  
 
-`ADS` 将允许通过适当的排序无损的更新配置。 例如，假设 *foo.com* 映射到集群 *X*。我们希望将路由表中的映射更改为集群 *Y* 中的 *foo.com*。为了做到这一点，必须首先提供包含两个集群 *X* 和 *Y* 的 `CDS/EDS` 更新。  
+`ADS` 将允许通过适当的排序无损的更新配置。例如，假设 *foo.com* 映射到集群 *X*。我们希望将路由表中的映射更改为集群 *Y* 中的 *foo.com*。为了做到这一点，必须首先提供包含两个集群 *X* 和 *Y* 的 `CDS/EDS` 更新。  
 
-如果没有`ADS`，`CDS/EDS/RDS`流可能指向不同的管理服务器，或者位于同一管理服务器上的不同`gRPC`流和连接需要协调。 `EDS`资源请求可以分成两个不同的流，一个用于*X*，另一个用于*Y*。`ADS`允许将这些请求合并为单个流到单个管理服务器，避免了分布式同步的需要，以正确地对更新进行排序。 依靠`ADS`，管理服务器将在单个数据流上提供`CDS`，`EDS`和`RDS`更新。  
+如果没有 `ADS`，`CDS/EDS/RDS` 流可能指向不同的管理服务器，或者位于同一管理服务器上的不同 `gRPC` 流和连接需要协调。 `EDS` 资源请求可以分成两个不同的流，一个用于 *X*，另一个用于 *Y*。`ADS`允许将这些请求合并为单个流到单个管理服务器，避免了分布式同步的需要，以正确地对更新进行排序。依靠 `ADS`，管理服务器将在单个数据流上提供`CDS`，`EDS`和`RDS`更新。  
 
 ADS 仅适用于 gRPC 流媒体（不是REST），在[本文档](https://github.com/envoyproxy/data-plane-api/blob/master/XDS_PROTOCOL.md#aggregated-discovery-services-ads)中有更详细的描述。`gRPC` 的端点是:   
 
 - `POST /envoy.api.v2.AggregatedDiscoveryService/StreamAggregatedResources`
 
-有关服务定义，请参阅[`discovery.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/discovery.proto)。 当在[`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap)配置的[`dynamic_resources`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources)中设置。
+有关服务定义，请参阅 [`discovery.proto`](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/discovery.proto)。 当在 [`Bootstrap`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-msg-config-bootstrap-v2-bootstrap) 配置的 [`dynamic_resources`](https://www.envoyproxy.io/docs/envoy/latest/api-v2/config/bootstrap/v2/bootstrap.proto.html#envoy-api-field-config-bootstrap-v2-bootstrap-dynamic-resources) 中设置。
 
-在 [discovery.proto](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/discovery.proto) 查看服务配置。当以下用于 Envoy 的客户端配置
+在 [discovery.proto](https://github.com/envoyproxy/data-plane-api/blob/master/envoy/api/v2/discovery.proto) 查看服务配置。当以下用于 Envoy 的客户端配置为
 
 ```yaml
 ads_config:
@@ -386,9 +385,9 @@ ads_config:
   cluster_names: [some_ads_cluster]
 ```
 
-时，Envoy将此用作客户端。  
+时，Envoy 将此用作客户端。  
 
-设置此项时，可以将[上述](#v2-grpc-streaming-endpoints)任何配置源设置为使用ADS通道。 例如，LDS配置可以从A   
+设置此项时，可以将[上述](#v2-grpc-streaming-endpoints)任何配置源设置为使用ADS通道。 例如，LDS 配置可以从
 
 
 ```yaml
@@ -408,7 +407,7 @@ lds_config: {ads: {}}
 
 ## 管理服务器不可达
 
-当`Envoy`实例失去与管理服务器的连接时，`Envoy`将锁定到先前的配置，同时在后台主动重试以重新建立与管理服务器的连接。  
+当 `Envoy` 实例失去与管理服务器的连接时，`Envoy` 将锁定到先前的配置，同时在后台主动重试以重新建立与管理服务器的连接。  
 
 Envoy 调试记录了每次尝试连接时都无法与管理服务器建立连接的事实。  
 

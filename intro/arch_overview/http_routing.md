@@ -1,9 +1,9 @@
 # HTTP路由
 
-Envoy 包括一个 HTTP [路由器过滤器](../../configuration/http_filters/router_filter.md#config-http-filters-router)，可以安装它来执行高级路由任务。这对于处理边缘流量（传统的反向代理请求处理）以及为服务 Envoy 网格构建服务（通常是通过主机/授权 HTTP 头的路由到达特定的上游服务集群）非常有用。Envoy 也可以被配置为转发代理。在正向代理配置中，网格客户端可以通过适当地配置他们的 http 代理来成为 Envoy。路由在一个高层级接受一个传入的 HTTP 请求，将其与上游集群相匹配，在上游集群中获得一个[连接池](../../intro/arch_overview/connection_pooling.md#arch-overview-conn-pool)，并转发请求。路由过滤器支持以下特性：
+Envoy 包括一个 HTTP [路由器过滤器](../../configuration/http_filters/router_filter.md#config-http-filters-router)，可以安装它来执行高级路由任务。这对于处理边缘流量（传统的反向代理请求处理）以及构建服务间的 Envoy 网格（通常是通过主机/授权 HTTP 头的路由到达特定的上游服务集群）非常有用。Envoy 也可以被配置为转发代理。在转发代理配置中，网格客户端可以通过适当地配置其 http 代理来成为 Envoy。路由在一个高层级接受一个传入的 HTTP 请求，将其与上游集群相匹配，在上游集群中获得一个[连接池](../../intro/arch_overview/connection_pooling.md#arch-overview-conn-pool)，并转发请求。路由过滤器支持以下特性：
 
 - 将域/授权映射到一组路由规则的虚拟主机。
-- 前缀和精确路径匹配规则（包括[大小写敏感](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/route#config-http-conn-man-route-table-route-case-sensitive)和大小写不敏感）。目前还不支持正则/ slug 匹配，这主要是因为难以用编程方式确定路由规则是否相互冲突。因此我们并不建议在反向代理级别使用正则/ slug 路由，但是我们将来可能会根据用户需求量增加对这个特性的支持。
+- 前缀和精确路径匹配规则（包括[大小写敏感](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/route#config-http-conn-man-route-table-route-case-sensitive)和大小写不敏感）。目前还不支持正则/slug 匹配，这主要是因为难以用编程方式确定路由规则是否相互冲突。因此我们并不建议在反向代理级别使用正则/slug 路由，但是我们将来可能会根据用户需求量增加对这个特性的支持。
 - 在虚拟主机级别上的 [TLS 重定向](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/vhost#config-http-conn-man-route-table-vhost-require-ssl)。
 - 在路由级别的[路径/主机](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/vhost#config-http-conn-man-route-table-vhost-require-ssl)重定向。
 - 在路由级别的直接（非代理）HTTP 响应。
@@ -31,7 +31,7 @@ HTTP 连接管理器的配置拥有所有配置的 HTTP 过滤器所使用的[�
 Envoy 允许在[路由配置](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/route#config-http-conn-man-route-table-route-retry)和通过[请求头](../../configuration/http_filters/router_filter.md#config-http-filters-router-headers)的特定请求中配置重试。以下配置是可能的：
 
 - **最大数量的重试**:Envoy 将继续进行多次尝试。在每次重试之间使用一个指数回溯算法。此外，*所有重试都包含在总体请求超时中*。这避免了由于大量重试而导致的长时间请求。
-- **重试条件**：Envoy 可以根据应用程序的要求对不同类型的条件进行重试。例如，网络故障，所有5xx响应代码，幂等4xx响应码，等等。
+- **重试条件**：Envoy 可以根据应用程序的要求对不同类型的条件进行重试。例如，网络故障，所有 5xx 响应代码、幂等 4xx 响应码等等。
 
 
 请注意，根据 [x-envoy-overloaded](../../configuration/http_filters/router_filter.md#config-http-filters-router-x-envoy-overloaded) 的内容，重试可能会被禁用。
@@ -52,8 +52,8 @@ Envoy 支持发送“直接”回应。这些是预先配置的 HTTP 响应，�
 
 直接响应有一个 HTTP 状态码和一个可选体。路由配置可以内联地指定响应体，或者指定包含体的文件的路径名。如果路线配置指定了一个文件路径名，Envoy  将在配置负载上读取文件并缓存内容。
 
-注意
+**注意**
 
-如果指定了响应体，那么它的大小必须不超过 4KB ，不管它是内联还是在文件中。Envoy 目前将所有正文保存在内存中，所以 4KB的限制本意上是为了防止代理的内存占用太大。
+如果指定了响应体，那么它的大小必须不超过 4KB ，不管它是内联还是在文件中。Envoy 目前将所有正文保存在内存中，所以 4KB 的限制本意上是为了防止代理的内存占用太大。
 
 如果路由或相关虚拟主机上设置了 **response_headers_to_add** ，Envoy 将在直接 HTTP 响应中包含指定的标头。

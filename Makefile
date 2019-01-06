@@ -1,5 +1,5 @@
 BOOK_NAME := envoyproxy
-BOOK_OUTPUT := docs
+BOOK_OUTPUT := _book
 
 .PHONY: install build all
 install:

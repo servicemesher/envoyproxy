@@ -22,14 +22,21 @@
 
 当传入连接通过 iptables 重定向或 TPROXY（查看真实 IP ）目标或使用代理协议重定向到 Envoy 时，可以使用原始目标集群。在这些情况下，使用元数据重定向的策略会使路由到原始目标集群的请求转发到上游主机，并且不需要任何明确的主机配置或上游主机发现机制。与上游主机的连接会被放入链接，并且闲置的主机在空闲时间比 [cleanup_interval_ms](https://www.envoyproxy.io/docs/envoy/latest/api-v1/cluster_manager/cluster#config-cluster-manager-cluster-cleanup-interval-ms) 长（默认值为5000 ms）时会被刷新。如果原始目标地址不可用，则不会打开上游连接。这种原始目的地服务发现的方式必须与原始目的地[负载均衡](load_balancing.md#arch-overview-load-balancing-types-original-destination)一起使用。
 
+### 终端发现服务（Endpoint Discovery Service）
 
-### 服务发现服务（SDS）
-Envoy 通过一个*发现服务的服务*获取集群成员，它是一个 [REST 风格的 API](https://www.envoyproxy.io/docs/envoy/latest/api-v1/cluster_manager/sds#config-cluster-manager-sds-api)。Lyft 提供了基于 Python 语言的 [发现服务](https://github.com/lyft/discovery)参考实现。该实现使用 AWS DynamoDB 作为存储类型，但该 API 非常简单，可以轻松地在各种不同的存储类型之上实施。对于每个 SDS 集群，Envoy 将定期从发现服务中获取集群成员。由于以下几个原因，SDS 是首选的服务发现机制：
+终端发现服务(EDS)是一个居于 gRPC 或 REST-JSON API 服务器的 xDS 管理服务，在 Envoy 中用来获取集群成员。集群成员在 Envoy 的术语中被称为“终端”。对于每个集群，Envoy 都会通过发现服务来获取成员的终端。由于以下几个原因，EDS 是首选的服务发现机制：
 
 - Envoy 对每个上游主机都有明确的了解（与通过 DNS 解析的负载均衡进行路由相比而言），并可以做出更智能的负载均衡决策。
 - 在每个主机的发现 API 响应中携带的额外属性通知 Envoy 负载均衡权重、金丝雀状态、区域等。这些附加属性在负载均衡、统计信息收集等过程中会被 Envoy 网格全局使用。
 
 通常，主动健康检查与最终一致的服务发现服务数据结合使用，以进行负载均衡和路由决策。这将在下一节中进一步讨论。
+
+
+### 服务发现服务（v1 SDS）
+
+> (弃用) 这个发现服务在 v2 xDS API 中会被终端发现服务取代
+
+Envoy 通过一个*发现服务的服务*获取集群成员，它是一个 [REST 风格的 API](https://www.envoyproxy.io/docs/envoy/latest/api-v1/cluster_manager/sds#config-cluster-manager-sds-api)。Lyft 提供了基于 Python 语言的 [发现服务](https://github.com/lyft/discovery)参考实现。该实现使用 AWS DynamoDB 作为存储类型，但该 API 非常简单，可以轻松地在各种不同的存储类型之上实施。对于每个 SDS 集群，Envoy 将定期从发现服务中获取集群成员。
 
 ## 关于服务发现的最终一致性
 
