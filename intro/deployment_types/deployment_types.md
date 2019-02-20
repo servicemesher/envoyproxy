@@ -8,7 +8,7 @@ Envoy 有多种使用场景，其中更多情况下会作为 *mesh* 被部署在
   - [可选外部服务 egress listener](service_to_service.md#optional-external-service-egress-listeners)
   - [发现服务集成](service_to_service.md#discovery-service-integration)
   - [配置模板](service_to_service.md#configuration-template)
-- 服务见外加前端代理
+- 服务间外加前端代理
   - [配置模板](front_proxy.md#configuration-template)
 - 服务间、前端代理、双向代理
   - [配置模板](double_proxy.md#configuration-template)
