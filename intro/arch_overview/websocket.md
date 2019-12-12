@@ -2,7 +2,7 @@
 
 Envoy 支持将 HTTP/1.1 连接升级到 WebSocket 连接。仅当下游客户端发送正确的升级请求头，并且被匹配的 HTTP 路由必须明确配置使用了 WebSocket （[use_websocket](https://www.envoyproxy.io/docs/envoy/latest/api-v1/route_config/route#config-http-conn-man-route-table-route-use-websocket)）时才允许连接升级。如果请求到达 WebSocket 的路由没有必要的升级头，它将被视为常规的 HTTP/1.1 请求。
 
-由于 Envoy 将 WebSocket 连接视为纯 TCP 连接，因此它支持 WebSocket 协议的所有内容，而与它们的报文格式无关。WebSocket 路由不支持某些 HTTP 请求级别的功能，例如重定向、超时、重试、速率限制和阴影。但是，支持前缀重、显式和自动主机重写、流量转移和拆分。
+由于 Envoy 将 WebSocket 连接视为纯 TCP 连接，因此它支持 WebSocket 协议的所有内容，而与它们的报文格式无关。WebSocket 路由不支持某些 HTTP 请求级别的功能，例如重定向、超时、重试、速率限制和阴影。但是，支持前缀重写、显式重写和自动主机重写、流量转移和拆分。
 
 ## 连接语义
 
