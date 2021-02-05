@@ -12,7 +12,7 @@
 
   新进程开始进行侦听并通知旧的进程开始删除动作。
 
-- 在删除旧的进程的时候，旧进程会尝试优雅地关闭现有的连接。可以怎么去做到这点呢？这取决于配置过滤器。可以使用  [`--drain-time-s`](../../operations/cli.md#cmdoption-drain-time-s)参数进行配置删除时间，如果传的时间参数越大，则删除动作会越发激进。
+- 在删除旧的进程的时候，旧进程会尝试优雅地关闭现有的连接。可以怎么去做到这点呢？这取决于配置过滤器。可以使用  [`--drain-time-s`](../../operations/cli.md#cmdoption-drain-time-s)参数进行配置删除时间，如果传的时间参数越小，则删除动作会越发激进。
 
 - 在删除完成后，新的 Envoy 进程将告知旧的 Envoy 进程将自己关掉。这个时间可以通过 [`--parent-shutdown-time-s`](../../operations/cli.md#cmdoption-parent-shutdown-time-s)参数进行配置。
 
