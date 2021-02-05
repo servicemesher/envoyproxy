@@ -140,7 +140,7 @@
 
 ## 每个服务区域动态 HTTP 统计
 
-如果服务区域可用于本地服务 (通过 [`--service-zone`](https://www.envoyproxy.io/docs/envoy/latest/operations/cli#cmdoption-service-zone)) 和 [上游集群](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/service_discovery#arch-overview-service-discovery-types-sds), Envoy 在将跟踪 *cluster.<name>.zone.<from_zone>.<to_zone>.* 命名空间的以下统计数据.
+如果服务区域可用于本地服务 (通过 [`--service-zone`](https://www.envoyproxy.io/docs/envoy/latest/operations/cli#cmdoption-service-zone)) 和 [上游集群](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/service_discovery#arch-overview-service-discovery-types-sds)， Envoy 在将跟踪 *cluster.<name>.zone.<from_zone>.<to_zone>.* 命名空间的以下统计数据.
 
 | 名称                    | 类型   | 描述  |
 | ----------------- | --------- | ---------------------------------------------------- |
